@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+	
+	<!-- Main process -->
+	<bean id="mainProcess" class="com.tuc.ai.avoid.ProcessAvoidImpl">
+		<constructor-arg index="0" ref="${space.controller.bean.name}" />
+		<constructor-arg index="1" ref="${space.view.bean.name}" />	
+		<constructor-arg index="2" value="${epoch.length}" />
+		<constructor-arg index="3" value="${space.friction}" /> 
+		<constructor-arg index="4" ref="log" />
+		<constructor-arg index="5" value="${delay}" />
+	</bean>
+	
+	<bean id="spaceController" class="com.tuc.ai.avoid.SpaceObjectController">
+		<constructor-arg index="0" value="${init.ship.count}" />
+		<constructor-arg index="1" value="${init.asteroid.count}" />
+		<constructor-arg index="2" value="${init.separation}" />
+		<constructor-arg index="3" value="${init.bounds.x}" />
+		<constructor-arg index="4" value="${init.bounds.y}" />
+		<constructor-arg index="5" value="${init.bounds.width}" />
+		<constructor-arg index="6" value="${init.bounds.height}" />
+		<constructor-arg index="7" value="${init.ship.velocity.min}" />
+		<constructor-arg index="8" value="${init.ship.velocity.max}" />
+		<constructor-arg index="9" value="${init.ship.size.min}" />
+		<constructor-arg index="10" value="${init.ship.size.max}" />
+		<constructor-arg index="11" value="${init.ship.mass.factor}" />
+		<constructor-arg index="12" value="${init.ship.mass.constant}" />
+		<constructor-arg index="13" value="${ship.mutation.range}" />
+		<constructor-arg index="14" value="${ship.mutation.rate}" />
+		<constructor-arg index="15" ref="${ship.crossover.function}" />
+		<constructor-arg index="16" value="${ship.crossover.rate}" />
+		<constructor-arg index="17" value="${init.asteroid.velocity.min}" />
+		<constructor-arg index="18" value="${init.asteroid.velocity.max}" />
+		<constructor-arg index="19" value="${init.asteroid.size.min}" />
+		<constructor-arg index="20" value="${init.asteroid.size.max}" />
+		<constructor-arg index="21" value="${init.asteroid.mass.factor}" />
+		<constructor-arg index="22" value="${init.asteroid.mass.constant}" />
+		<constructor-arg index="23" value="${ship.bean.name}" />
+		<constructor-arg index="24" value="${asteroid.bean.name}" />
+		<constructor-arg index="25" ref="log" />
+		<constructor-arg index="26" value="${ship.log.frequency}" />
+		<constructor-arg index="27" value="${init.ship.swap.count}" />
+	</bean>
+	
+	<bean id="spaceView" class="com.tuc.ai.avoid.SpaceView" >
+		<constructor-arg index="0" value="${init.space.width}" />
+		<constructor-arg index="1" value="${init.space.height}" />
+		<constructor-arg index="2" ref="${space.controller.bean.name}" />
+	</bean>
+	
+	<!-- Space Objects -->
+	<bean id="ship" class="com.tuc.ai.avoid.ShipImpl" scope="prototype">
+		<constructor-arg index="0" ref="${ship.neural.network.bean.name}" />
+		<constructor-arg index="1" value="${ship.max.thrust}" />
+		<constructor-arg index="2" value="${ship.number.tracking}" />
+		<constructor-arg index="3" ref="log" />
+	</bean>
+	
+	<bean id="asteroid" class="com.tuc.ai.avoid.AsteroidImpl" scope="prototype" />
+	
+	<!-- Neural Network -->
+	<bean id="neuralNetwork" class="com.tuc.ai.nernet.NeuralNetworkImpl" scope="prototype">
+		<constructor-arg index="0" value="${neural.network.inputs}" />
+		<constructor-arg index="1" value="${neural.network.outputs}" />
+		<constructor-arg index="2" ref="${neural.network.layers}" />
+		<constructor-arg index="3" ref="log" />
+	</bean>
+	
+	<util:list id="neuronLayerList" scope="prototype">
+		<bean class="com.tuc.ai.nernet.NeuronLayerImpl" scope="prototype">
+				<constructor-arg index="0" value="${neuron.layer.input.neurons}" />
+				<constructor-arg index="1" value="${neural.network.inputs}" />
+				<constructor-arg index="2" value="${neuron.layer.input.bias}" />
+				<constructor-arg index="3" value="${neuron.layer.input.min}" />
+				<constructor-arg index="4" value="${neuron.layer.input.max}" />
+				<constructor-arg index="5" ref="log" />
+				<property name="utility" ref="nerNetUtility" />
+		</bean>
+		<bean class="com.tuc.ai.nernet.NeuronLayerImpl" scope="prototype">
+				<constructor-arg index="0" value="${neuron.layer.hidden.neurons}" />
+				<constructor-arg index="1" value="${neuron.layer.input.neurons}" />
+				<constructor-arg index="2" value="${neuron.layer.hidden.bias}" />
+				<constructor-arg index="3" value="${neuron.layer.hidden.min}" />
+				<constructor-arg index="4" value="${neuron.layer.hidden.max}" />
+				<constructor-arg index="5" ref="log" />
+				<property name="utility" ref="nerNetUtility" />
+		</bean>
+		<bean class="com.tuc.ai.nernet.NeuronLayerImpl" scope="prototype">
+				<constructor-arg index="0" value="${neuron.layer.hiddenb.neurons}" />
+				<constructor-arg index="1" value="${neuron.layer.hidden.neurons}" />
+				<constructor-arg index="2" value="${neuron.layer.hiddenb.bias}" />
+				<constructor-arg index="3" value="${neuron.layer.hiddenb.min}" />
+				<constructor-arg index="4" value="${neuron.layer.hiddenb.max}" />
+				<constructor-arg index="5" ref="log" />
+				<property name="utility" ref="nerNetUtility" />
+		</bean>
+		<bean class="com.tuc.ai.nernet.NeuronLayerImpl" scope="prototype">
+				<constructor-arg index="0" value="${neuron.layer.output.neurons}" />
+				<constructor-arg index="1" value="${neuron.layer.hiddenb.neurons}" />
+				<constructor-arg index="2" value="${neuron.layer.output.bias}" />
+				<constructor-arg index="3" value="${neuron.layer.output.min}" />
+				<constructor-arg index="4" value="${neuron.layer.output.max}" />
+				<constructor-arg index="5" ref="log" />
+				<property name="utility" ref="nerNetUtility" />
+		</bean>
+	</util:list>
+	
+	<bean id="nerNetUtility" class="com.tuc.ai.nernet.NerNetUtility">
+		<property name="activationResponse" value="${sigmoid.activation.response}" />
+	</bean>
+	
+	<!-- Genetic Algorithm -->
+	<bean id="crossoverThree" class="com.tuc.ai.genalg.CrossoverThreeImpl" />
+	
+	<!-- Logging -->
+	<bean id="log" class="com.tuc.ai.AILoggerFileImpl">
+		<constructor-arg index="0" value="${log.dir}/${log.file.name}" />
+	</bean>
+
+	<!-- Property Placeholder Configurer -->
+	<bean id="placeholderConfig" class="com.tuc.ai.ArgumentListPropertyConfigurer" />
+</beans>

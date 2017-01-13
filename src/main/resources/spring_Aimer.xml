@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+	
+	<!-- Main process -->
+	<bean id="mainProcess" class="com.tuc.ai.genalg.ProcessGeneticAlgorithmImpl">
+		<constructor-arg index="0" value="${population}" />
+		<constructor-arg index="1" ref="${fitness.function}" />
+		<constructor-arg index="2" ref="${crossover.function}" />
+		<constructor-arg index="3" value="${crossover.rate}" />
+		<constructor-arg index="4" value="${mutation.rate}" />
+		<constructor-arg index="5" ref="${chromosome.display}" />
+		<constructor-arg index="6" value="${chromosome.bean.name}" />
+	</bean>
+	
+	<!-- Chromosomes -->
+	<bean id="chromosomeBoolean" class="com.tuc.ai.genalg.ChromosomeBooleanImpl" scope="prototype">
+		<constructor-arg index="0" value="${chromosome.size}" />
+	</bean>
+	
+	<!-- Crossover Functions -->
+	<bean id="crossoverThree" class="com.tuc.ai.genalg.CrossoverThreeImpl" />
+	<bean id="crossoverTwo" class="com.tuc.ai.genalg.CrossoverTwoImpl" />
+	
+	<!-- Genetic Algorithms -->
+	<bean id="aim" class="com.tuc.ai.genalg.aim.AimImpl" scope="prototype" >
+		<constructor-arg index="0" value="${aim.element.size}" />
+		<constructor-arg index="1" ref="${target.bean}" />
+		<constructor-arg index="2" value="${score.goal}" />
+	</bean>
+
+	<!-- Utilities -->
+	<bean id="target2d" class="com.tuc.ai.genalg.aim.TargetStationaryPointImpl">
+		<constructor-arg index="0" value="${target.x.value}" />
+		<constructor-arg index="1" value="${target.y.value}" />
+	</bean>
+	
+	<bean id="target2dRandom" class="com.tuc.ai.genalg.aim.TargetRandomPointImpl" init-method="init" />
+
+	<!-- Property Placeholder Configurer -->
+	<bean id="placeholderConfig" class="com.tuc.ai.ArgumentListPropertyConfigurer" />
+
+</beans>
