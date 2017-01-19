@@ -3,6 +3,8 @@ package com.tuc.ai;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -37,7 +39,7 @@ public class ArgumentListPropertyConfigurer extends PropertyPlaceholderConfigure
 	 * 
 	 * @param props
 	 */
-	public static void setProps( Properties props )
+	public void setProps( Properties props )
 	{
 		if ( null != props )
 		{
@@ -54,22 +56,32 @@ public class ArgumentListPropertyConfigurer extends PropertyPlaceholderConfigure
 	 * @param args
 	 * @throws AIException
 	 */
-	public static void setProperties( String propertyFile, String[] args ) throws AIException
+	public void setProperties( String propertyFile, String[] args ) throws AIException
 	{
 		myProps = new Properties();
 		
 		// Load the properties from the first argument
-		if ( null != propertyFile )
+		try
 		{
-			try
+			if ( null != propertyFile && !propertyFile.startsWith("res") )
 			{
 				myProps.load( new FileInputStream( new File( propertyFile ) ) );
 			}
-			catch ( IOException ioe )
+			else
 			{
-				throw new AIException( "Error with Property File: " + propertyFile + NEWLINE + ioe.getMessage() );
+				propertyFile = "Avoid_ship_only.properties";
+				ClassLoader classLoader = getClass().getClassLoader();
+				InputStream file = classLoader.getResourceAsStream(propertyFile);
+				//InputStream file = new FileInputStream(new File( url.toURI()));
+
+				myProps.load( file );
 			}
 		}
+		catch ( Exception ioe )
+		{
+			throw new AIException( "Error with Property File: " + propertyFile + NEWLINE + ioe.getMessage() );
+		}
+
 		
 		// The rest of the arguments are property overrides
 		if ( null != args )
@@ -96,7 +108,7 @@ public class ArgumentListPropertyConfigurer extends PropertyPlaceholderConfigure
 	/**
 	 * 
 	 */
-	public static void listProperties()
+	public void listProperties()
 	{
 		StringBuffer info = new StringBuffer();
 		
@@ -114,7 +126,7 @@ public class ArgumentListPropertyConfigurer extends PropertyPlaceholderConfigure
 	 * 
 	 * @return
 	 */
-	public static Properties getProperties()
+	public Properties getProperties()
 	{
 		return myProps;
 	}

@@ -7,6 +7,11 @@ public class Main
 
 	/**
 	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) 
@@ -24,12 +29,14 @@ public class Main
 	public int process( String[] args )
 	{
 		int exitStatus = AIConstants.SUCCESS_STATUS;
+		ApplicationContextCreator acc = new ApplicationContextCreator();
+		ArgumentListPropertyConfigurer alpc = new ArgumentListPropertyConfigurer();
 		
 		try
 		{
-			ApplicationContext ctx = ApplicationContextCreator.createContext( args );
-			AIProcess mainProcess = (AIProcess)ctx.getBean( ArgumentListPropertyConfigurer.getProperties().getProperty( AIConstants.MAIN_PROCESS ) );
-			exitStatus = mainProcess.process( ctx, ArgumentListPropertyConfigurer.getProperties() );
+			ApplicationContext ctx = acc.createContext( args, alpc );
+			AIProcess mainProcess = (AIProcess)ctx.getBean( alpc.getProperties().getProperty( AIConstants.MAIN_PROCESS ) );
+			exitStatus = mainProcess.process( ctx, alpc.getProperties() );
 		}
 		catch ( AIException aie )
 		{

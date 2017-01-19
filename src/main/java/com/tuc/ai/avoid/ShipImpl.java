@@ -155,7 +155,7 @@ public class ShipImpl extends SpaceObjectAbstractImpl implements Ship
 	{
 		if ( super.handleBoundaries( r ) )
 		{
-			incrCollisions( 2 );
+			incrCollisions( 8 );
 		}
 		
 		return false;

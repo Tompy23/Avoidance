@@ -12,28 +12,39 @@ import org.springframework.context.ApplicationContext;
 public class ApplicationContextCreator 
 {
 	private static MyPropertyConfigurationManager propsManager;
-	
+	private ArgumentListPropertyConfigurer alpc = null;
 	/**
 	 * 
 	 * @param args
 	 * @return
 	 * @throws AIException
 	 */
-	public static ApplicationContext createContext( String[] args ) throws AIException
+	public ApplicationContext createContext( String[] args, ArgumentListPropertyConfigurer alpc ) throws AIException
 	{
+		this.alpc = alpc;
 		String propertiesFile = null;
 		String[] commandLineArgs = null;
+		String propHome = null;
 		
 		if ( args.length > 0 )
 		{
-			propertiesFile = System.getenv( AIConstants.PROP_HOME ) + File.separator + args[ 0 ];
+			propHome = System.getenv(AIConstants.PROP_HOME ); 
+			propertiesFile = ( null != propHome ? propHome + File.separator : "" ) + args[ 0 ];
 			commandLineArgs = new String[ args.length - 1 ];
 			System.arraycopy( args, 1, commandLineArgs, 0, args.length - 1 );
 		}
 		else
 		{
-			throw new AIException( "Missing properties file in command line arguments list." );
+			propHome = System.getenv(AIConstants.PROP_HOME ); 
+			propertiesFile = ( "res/Avoid_ship_only.properties" );
+			//commandLineArgs = new String[ args.length - 1 ];
+			//System.arraycopy( args, 1, commandLineArgs, 0, args.length - 1 );
 		}
+//		}
+//		else
+//		{
+//			throw new AIException( "Missing properties file in command line arguments list." );
+//		}
 		
 		return createContext( propertiesFile, commandLineArgs );
 	}
@@ -45,11 +56,11 @@ public class ApplicationContextCreator
 	 * @return
 	 * @throws AIException
 	 */
-	public static ApplicationContext createContext( String propertiesFile, String[] args ) throws AIException
+	public ApplicationContext createContext( String propertiesFile, String[] args ) throws AIException
 	{
-		ArgumentListPropertyConfigurer.setProperties( propertiesFile, args );
+		alpc.setProperties( propertiesFile, args );
 		
-		String springMain = ArgumentListPropertyConfigurer.getProperties().getProperty( AIConstants.SPRING_MAIN ); 
+		String springMain = alpc.getProperties().getProperty( AIConstants.SPRING_MAIN ); 
 		
 		if ( null == springMain )
 		{
@@ -58,14 +69,14 @@ public class ApplicationContextCreator
 		
 		if ( null != propsManager )
 		{
-			ArgumentListPropertyConfigurer.setProps( propsManager.preContextCreation( ArgumentListPropertyConfigurer.getProperties() ) );
+			alpc.setProps( propsManager.preContextCreation( alpc.getProperties() ) );
 		}
 		
 		ApplicationContext returnContext = new AIClassPathXmlApplicationContext( springMain ); 
 		
 		if ( null != propsManager )
 		{
-			ArgumentListPropertyConfigurer.setProps( propsManager.postContextCreation( ArgumentListPropertyConfigurer.getProperties() ) );
+			alpc.setProps( propsManager.postContextCreation( alpc.getProperties() ) );
 		}
 
 		return returnContext;
@@ -75,7 +86,7 @@ public class ApplicationContextCreator
 	 * 
 	 * @param manager
 	 */
-	public static void registerPropertyManager( MyPropertyConfigurationManager manager )
+	public void registerPropertyManager( MyPropertyConfigurationManager manager )
 	{
 		propsManager = manager;
 	}
